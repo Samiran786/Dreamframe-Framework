@@ -3,6 +3,11 @@ import axios from 'axios';
 let sessionId = null;
 let baseUrl = 'http://localhost:9515/session';
 
+/*
+    Going to create createSession() which will return a sessionId - 
+    In this function I will hit post method on the baseUrl by axios and will extract the sessionId
+    from that response - response.data.value.sessionId
+*/
 export async function createSession(){
     const response = await axios.post(
             baseUrl,
@@ -16,12 +21,16 @@ export async function createSession(){
     );
 
     sessionId = response.data.value.sessionId;
+    console.log(response);
     console.log("Session created!");
     console.log('Session Created with ID: ', sessionId);
     return sessionId;
 }
 
-
+/*
+    Going to create "sendCommand(method, endpoint, payload = {})" which return the axios respons
+    of the given parameters like method, url and data: payload.
+*/
 export async function sendCommand (method, endpoint, payload = {}){
     // console.log("Send command: ", command);
     // console.log("with data: ", payload);
@@ -36,4 +45,48 @@ export async function sendCommand (method, endpoint, payload = {}){
         url,
         data: payload
     });
+}
+
+/*
+    Going to create "findElement(selector)" function to find an element - 
+    it will return a elementId which will be needed to perform action on that.
+    Framework works on elementId not the element itself.
+ */
+ export async function findElement(selector){
+        const response = await sendCommand(
+            'post',
+            '/element',
+            {
+                using : 'css selector',
+                value: selector
+            }
+        );
+
+        console.log(response);
+        // WebDriver returns an element reference object
+        const elementId = response.data.value['element-6066-11e4-a52e-4f735466cecf'];
+        return elementId;
+ }
+
+ /*
+    Going to create a clickElemet(elementId) function to perform click action -
+    It will only going to run the post request to endpoint "/element/${elementId}/click"
+ */
+export async function clickElement(elementId){
+        await sendCommand(
+            'post',
+            `/element/${elementId}/click`
+        );
+}
+
+/*
+    Going to create a openPageUrl(url) function to perform open a page - 
+    It will only going to run the post request to endpoint "/url" with { url } payload
+*/
+export async function openPageUrl(url){
+    await sendCommand(
+        'post',
+        '/url',
+        { url }
+    );
 }
