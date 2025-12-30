@@ -6,4 +6,4 @@ import { $ } from "../src/index.js"
 
 await createSession();
 await openUrl("https://example.com");
-await $("a").click();
+await $("h3").click();
